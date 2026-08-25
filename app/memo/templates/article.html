@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ article['title'] }} | Knowledge Base{% endblock %}
+{% block content %}
+  <article class="knowledge">
+    <p><a href="{{ url_for('index') }}">← 記事一覧へ</a></p>
+    <header>
+      <h1>{{ article['title'] }}</h1>
+      {% if article_tags %}
+        <div class="tag-list">
+          {% for tag in article_tags %}<a class="tag" href="{{ url_for('index', tag=tag) }}">{{ tag }}</a>{% endfor %}
+        </div>
+      {% endif %}
+      <p class="meta">作成 {{ article['created_at'][:10] }} / 更新 {{ article['updated_at'][:10] }}</p>
+    </header>
+    <div class="markdown-body">{{ article['content_md']|markdown }}</div>
+    {% if has_role('editor') %}
+      <footer class="article-footer">
+        <a href="{{ url_for('edit_article', article_id=article['id']) }}">この記事を編集</a>
+        <a href="{{ url_for('article_history', article_id=article['id']) }}">変更履歴</a>
+      </footer>
+    {% else %}
+      <footer class="article-footer"><a href="{{ url_for('article_history', article_id=article['id']) }}">変更履歴</a></footer>
+    {% endif %}
+  </article>
+{% endblock %}

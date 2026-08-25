@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}記事一覧 | Knowledge Base{% endblock %}
+{% block content %}
+  <section class="page-heading heading-with-action">
+    <div>
+      <p class="label">KNOWLEDGE</p>
+      <h1>ナレッジ一覧</h1>
+    </div>
+    {% if has_role('editor') %}<a class="button" href="{{ url_for('create_article') }}">新規作成</a>{% endif %}
+  </section>
+
+  <form class="search-form" method="get">
+    <label for="q">全文検索</label>
+    <input id="q" name="q" type="search" value="{{ search_text }}">
+    <label for="tag">タグ</label>
+    <select id="tag" name="tag">
+      <option value="">すべて</option>
+      {% for tag in tags %}
+        <option value="{{ tag['name'] }}"{% if selected_tag == tag['name'] %} selected{% endif %}>{{ tag['name'] }} ({{ tag['article_count'] }})</option>
+      {% endfor %}
+    </select>
+    <button class="button" type="submit">検索</button>
+    {% if search_text or selected_tag %}<a href="{{ url_for('index') }}">クリア</a>{% endif %}
+  </form>
+
+  {% if articles %}
+    <div class="article-list">
+      {% for article in articles %}
+        <article class="article-row">
+          <div>
+            <h2><a href="{{ url_for('article_detail', article_id=article['id']) }}">{{ article['title'] }}</a></h2>
+            {% if article['tag_names'] %}
+              <div class="tag-list">
+                {% for tag in article['tag_names'].split(',') %}<a class="tag" href="{{ url_for('index', tag=tag) }}">{{ tag }}</a>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+          <time datetime="{{ article['updated_at'] }}">更新 {{ article['updated_at'][:10] }}</time>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <p>該当するナレッジはありません。</p>
+    </div>
+  {% endif %}
+
+  {% if pagination['total_pages'] > 1 %}
+    <nav class="pagination" aria-label="記事一覧のページ">
+      {% if pagination['has_previous'] %}
+        <a href="{{ url_for('index', q=search_text, tag=selected_tag, page=pagination['page'] - 1) }}">前へ</a>
+      {% endif %}
+      <span>{{ pagination['page'] }} / {{ pagination['total_pages'] }}</span>
+      {% if pagination['has_next'] %}
+        <a href="{{ url_for('index', q=search_text, tag=selected_tag, page=pagination['page'] + 1) }}">次へ</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

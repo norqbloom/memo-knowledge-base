@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}記事の入出力 | Knowledge Base{% endblock %}
+{% block content %}
+  <section class="page-heading">
+    <p class="label">ADMIN</p>
+    <h1>記事の入出力</h1>
+  </section>
+
+  <div class="transfer-grid">
+    <section class="tool-card">
+      <h2>エクスポート</h2>
+      <a class="button" href="{{ url_for('export_articles_csv') }}">CSVをダウンロード</a>
+    </section>
+
+    <section class="tool-card">
+      <h2>インポート</h2>
+      <form method="post" action="{{ url_for('import_articles_csv') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label for="csv_file">CSVファイル</label>
+        <input id="csv_file" name="csv_file" type="file" accept=".csv,text/csv" required>
+        <button class="button" type="submit">インポート</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}

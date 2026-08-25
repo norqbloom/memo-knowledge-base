@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}変更履歴 | {{ article['title'] }}{% endblock %}
+{% block content %}
+  <section class="page-heading">
+    <p class="label">HISTORY</p>
+    <h1>{{ article['title'] }}</h1>
+  </section>
+  <div class="history-list">
+    {% for revision in revisions %}
+      <article>
+        <div>
+          <strong>バージョン {{ revision['version_no'] }}</strong>
+          <span>{{ revision['title'] }}</span>
+          <small>{{ revision['created_at'] }} / {{ revision['changed_by'] }} / {{ action_labels.get(revision['action'], revision['action']) }}</small>
+        </div>
+        <a href="{{ url_for('revision_detail', article_id=article['id'], revision_id=revision['id']) }}">表示</a>
+      </article>
+    {% endfor %}
+  </div>
+  {% if pagination['total_pages'] > 1 %}
+    <nav class="pagination" aria-label="変更履歴のページ">
+      {% if pagination['has_previous'] %}<a href="{{ url_for('article_history', article_id=article['id'], page=pagination['page'] - 1) }}">前へ</a>{% endif %}
+      <span>{{ pagination['page'] }} / {{ pagination['total_pages'] }}</span>
+      {% if pagination['has_next'] %}<a href="{{ url_for('article_history', article_id=article['id'], page=pagination['page'] + 1) }}">次へ</a>{% endif %}
+    </nav>
+  {% endif %}
+  <p>
+    {% if article['deleted_at'] %}<a href="{{ url_for('article_trash') }}">ゴミ箱へ戻る</a>
+    {% else %}<a href="{{ url_for('article_detail', article_id=article['id']) }}">記事へ戻る</a>{% endif %}
+  </p>
+{% endblock %}

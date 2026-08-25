@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}ログイン | Knowledge Base{% endblock %}
+{% block content %}
+  <section class="login-panel">
+    <p class="label">SIGN IN</p>
+    <h1>ログイン</h1>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <label for="username">ユーザ名</label>
+      <input id="username" name="username" autocomplete="username" required autofocus>
+      <label for="password">パスワード</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button class="button" type="submit">ログイン</button>
+    </form>
+  </section>
+{% endblock %}

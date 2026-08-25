@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% set is_edit = mode == "edit" %}
+{% block title %}{{ '編集' if is_edit else '新規作成' }} | Knowledge Base{% endblock %}
+{% block head %}<script src="{{ url_for('static', filename='preview.js') }}" defer></script>{% endblock %}
+{% block content %}
+  <section class="page-heading">
+    <p class="label">EDITOR / {{ 'EDIT' if is_edit else 'NEW' }}</p>
+    <h1>ナレッジを{{ '編集' if is_edit else '作成' }}</h1>
+  </section>
+
+  <form class="editor" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if is_edit %}<input type="hidden" name="lock_version" value="{{ article['lock_version'] }}">{% endif %}
+    {% if conflict %}<p class="message message--error">最新の内容と競合しました。入力内容は保持されています。</p>{% endif %}
+    <label for="title">タイトル</label>
+    <input id="title" name="title" maxlength="150" required value="{{ article['title'] }}">
+
+    <label for="tag-search">タグ</label>
+    <div class="tag-picker" data-tag-picker>
+      <div class="selected-tags" data-selected-tags></div>
+      <input id="tag-search" type="search" autocomplete="off" aria-autocomplete="list" aria-controls="tag-suggestions">
+      <div id="tag-suggestions" class="tag-suggestions" role="listbox" hidden></div>
+      <input id="tags_json" name="tags_json" type="hidden" value="{{ article_tags|tojson|forceescape }}">
+    </div>
+
+    <label for="content_md">本文（Markdown）</label>
+    <div class="editor-tabs" role="tablist" aria-label="Markdown編集表示の切り替え">
+      <button type="button" role="tab" aria-selected="true" aria-controls="edit-pane" data-editor-tab="edit">編集</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="preview-pane" data-editor-tab="preview">プレビュー</button>
+    </div>
+    <div id="edit-pane" role="tabpanel">
+      <textarea id="content_md" name="content_md" maxlength="50000" rows="22" required>{{ article['content_md'] }}</textarea>
+    </div>
+    <div id="preview-pane" class="markdown-body preview-pane" role="tabpanel" hidden>
+      <p class="preview-placeholder">プレビューを選択すると表示されます。</p>
+    </div>
+    <div class="form-actions">
+      <button class="button" type="submit">{{ '更新' if is_edit else '作成' }}</button>
+      <a href="{{ url_for('index') }}">キャンセル</a>
+    </div>
+  </form>
+
+  {% if is_edit %}
+    <form class="delete-form" method="post" action="{{ url_for('delete_article', article_id=article['id']) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="link-button danger" type="submit">この記事をゴミ箱へ移動</button>
+    </form>
+  {% endif %}
+{% endblock %}

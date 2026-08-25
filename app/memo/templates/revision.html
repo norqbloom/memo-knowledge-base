@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}バージョン {{ revision['version_no'] }} | {{ revision['title'] }}{% endblock %}
+{% block content %}
+  <article class="knowledge">
+    <p><a href="{{ url_for('article_history', article_id=revision['article_id']) }}">← 変更履歴へ</a></p>
+    <header>
+      <p class="label">VERSION {{ revision['version_no'] }}</p>
+      <h1>{{ revision['title'] }}</h1>
+      {% if revision_tags %}
+        <div class="tag-list">{% for tag in revision_tags %}<span class="tag">{{ tag }}</span>{% endfor %}</div>
+      {% endif %}
+      <p class="meta">{{ revision['created_at'] }} / {{ revision['changed_by'] }} / {{ action_labels.get(revision['action'], revision['action']) }}</p>
+    </header>
+    <div class="markdown-body">{{ revision['content_md']|markdown }}</div>
+    {% if has_role('editor') and not revision['deleted_at'] %}
+      <form class="restore-form" method="post" action="{{ url_for('restore_revision', article_id=revision['article_id'], revision_id=revision['id']) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="button" type="submit">このバージョンを復元</button>
+      </form>
+    {% endif %}
+  </article>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}ゴミ箱 | Knowledge Base{% endblock %}
+{% block content %}
+  <section class="page-heading">
+    <p class="label">TRASH</p>
+    <h1>ゴミ箱</h1>
+  </section>
+
+  {% if articles %}
+    <div class="admin-list">
+      {% for article in articles %}
+        <article>
+          <div>
+            <strong>{{ article['title'] }}</strong>
+            <small>{{ article['deleted_at'] }} / {{ article['deleted_by'] }}</small>
+          </div>
+          <div class="actions">
+            <a href="{{ url_for('article_history', article_id=article['id']) }}">変更履歴</a>
+            <form method="post" action="{{ url_for('restore_trashed_article', article_id=article['id']) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="link-button" type="submit">復元</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty"><p>ゴミ箱は空です。</p></div>
+  {% endif %}
+
+  {% if pagination['total_pages'] > 1 %}
+    <nav class="pagination" aria-label="ゴミ箱のページ">
+      {% if pagination['has_previous'] %}<a href="{{ url_for('article_trash', page=pagination['page'] - 1) }}">前へ</a>{% endif %}
+      <span>{{ pagination['page'] }} / {{ pagination['total_pages'] }}</span>
+      {% if pagination['has_next'] %}<a href="{{ url_for('article_trash', page=pagination['page'] + 1) }}">次へ</a>{% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

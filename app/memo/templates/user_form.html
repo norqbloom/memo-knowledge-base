@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% set is_edit = mode == "edit" %}
+{% block title %}ユーザ{{ '編集' if is_edit else '追加' }} | Knowledge Base{% endblock %}
+{% block content %}
+  <section class="page-heading">
+    <p class="label">ADMIN / USER</p>
+    <h1>ユーザを{{ '編集' if is_edit else '追加' }}</h1>
+  </section>
+
+  <form class="editor compact-form" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="username">ユーザ名</label>
+    <input id="username" name="username" maxlength="50" pattern="[A-Za-z0-9_.-]{3,50}" required value="{{ user['username'] }}">
+
+    <label for="role">ロール</label>
+    <select id="role" name="role" required>
+      {% for role in roles %}
+        <option value="{{ role }}"{% if user['role'] == role %} selected{% endif %}>{{ role_labels[role] }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="password">パスワード{% if is_edit %}（変更する場合のみ）{% endif %}</label>
+    <input id="password" name="password" type="password" minlength="8" autocomplete="new-password"{% if not is_edit %} required{% endif %}>
+
+    <div class="form-actions">
+      <button class="button" type="submit">{{ '更新' if is_edit else '追加' }}</button>
+      <a href="{{ url_for('manage_users') }}">キャンセル</a>
+    </div>
+  </form>
+{% endblock %}
